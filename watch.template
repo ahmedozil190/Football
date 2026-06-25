@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mpegts.js@latest/dist/mpegts.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
         .watch-container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
@@ -133,14 +134,42 @@
                     video.play();
                 }
             } else {
-                video.src = finalUrl;
-                video.onerror = () => {
-                    const codes = {1:'ABORTED', 2:'NETWORK', 3:'DECODE', 4:'SRC_NOT_SUPPORTED'};
-                    showError(`Video Error ${video.error?.code}: ${codes[video.error?.code] || 'Unknown'}`);
-                };
-                video.play().catch(e => {
-                    if (e.name !== 'NotAllowedError') showError(`Play Error: ${e.message}`);
-                });
+                // بث MPEG-TS - نستخدم mpegts.js
+                let tsTimeout = setTimeout(() => {
+                    showError('Stream timeout: السيرفر لا يرسل بيانات أو البصيغة غير مدعومة');
+                }, 15000);
+
+                if (typeof mpegts !== 'undefined' && mpegts.getFeatureList().mseLivePlayback) {
+                    const player = mpegts.createPlayer({
+                        type: 'mpegts',
+                        isLive: true,
+                        url: finalUrl
+                    });
+                    player.attachMediaElement(video);
+                    player.load();
+                    player.on(mpegts.Events.MEDIA_INFO, () => {
+                        clearTimeout(tsTimeout);
+                        video.play().catch(() => {});
+                    });
+                    player.on(mpegts.Events.ERROR, (type, detail) => {
+                        clearTimeout(tsTimeout);
+                        showError(`mpegts Error: ${type} - ${JSON.stringify(detail)}`);
+                    });
+                } else {
+                    // fallback للمتصفحات التي لا تدعم mpegts
+                    video.src = finalUrl;
+                    video.onerror = () => {
+                        clearTimeout(tsTimeout);
+                        const codes = {1:'ABORTED', 2:'NETWORK', 3:'DECODE', 4:'SRC_NOT_SUPPORTED'};
+                        showError(`Video Error ${video.error?.code}: ${codes[video.error?.code] || 'Unknown'}`);
+                    };
+                    video.play().catch(e => {
+                        if (e.name !== 'NotAllowedError') {
+                            clearTimeout(tsTimeout);
+                            showError(`Play Error: ${e.message}`);
+                        }
+                    });
+                }
             }
         }
     </script>
