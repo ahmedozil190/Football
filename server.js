@@ -7,9 +7,8 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// دالة البروكسي الذكية التي تتبع التحويلات بهوية VLC
 function proxyRequest(targetUrl, res, redirectCount = 0) {
-    if (redirectCount > 5) return res.status(500).send('Too many redirects');
+    if (redirectCount > 10) return res.status(500).send('Too many redirects');
     try {
         const parsedTarget = new URL(targetUrl);
         const protocol = parsedTarget.protocol === 'https:' ? https : http;
@@ -46,7 +45,6 @@ app.get('/watch.php', (req, res) => {
     const match = matches.find(m => m.id == id);
     if (match) {
         let html = fs.readFileSync(path.join(__dirname, 'watch.template'), 'utf8');
-        // تبديل المتغيرات بدقة للحفاظ على التصميم
         html = html.replace(/<\?php echo \$m\[\'homeTeam\'\] \?\? \'\'; \?>/g, match.homeTeam);
         html = html.replace(/<\?php echo \$m\[\'awayTeam\'\] \?\? \'\'; \?>/g, match.awayTeam);
         html = html.replace(/<\?php echo \$m\[\'homeLogo\'\] \?\? \'\'; \?>/g, match.homeLogo);
@@ -54,7 +52,6 @@ app.get('/watch.php', (req, res) => {
         html = html.replace(/<\?php echo \$m\[\'homeScore\'\] \?\? \'\'; \?>/g, match.homeScore);
         html = html.replace(/<\?php echo \$m\[\'awayScore\'\] \?\? \'\'; \?>/g, match.awayScore);
         html = html.replace(/<\?php echo \$m\[\'stream_url\'\] \?\? \'\'; \?>/g, match.stream_url);
-        // حذف أي كود PHP متبقي لكي لا يظهر كنص
         html = html.replace(/<\?php[\s\S]*?\?>/g, '');
         res.send(html);
     } else res.status(404).send('Match not found');
@@ -63,10 +60,9 @@ app.get('/watch.php', (req, res) => {
 app.get('/', (req, res) => {
     let html = fs.readFileSync(path.join(__dirname, 'index.template'), 'utf8');
     const matches = fs.readFileSync(path.join(__dirname, 'data/matches.json'), 'utf8');
-    // حقن البيانات في الجافاسكريبت لكي تعمل الواجهة الأصلية
-    const injection = `<script>const allMatches = ${matches}; console.log("Matches Loaded");</script>`;
-    html = html.replace(/<\?php[\s\S]*?\$allMatches = [\s\S]*?\?>/g, injection);
-    html = html.replace(/<\?php[\s\S]*?\?>/g, '');
+    const injection = `<script>const allMatches = ${matches};</script>`;
+    // استبدال العلامة النظيفة بالبيانات
+    html = html.replace('{{MATCHES_INJECTION}}', injection);
     res.send(html);
 });
 
