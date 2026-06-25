@@ -1,0 +1,22 @@
+# تشغيل محرك PHP داخل ملفات HTML
+AddType application/x-httpd-php .html .htm
+
+RewriteEngine On
+RewriteBase /
+
+# 1. إخفاء امتداد .html من الروابط
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# 2. تحويل أي طلب مباشر لـ index.html إلى الرابط الرئيسي /
+RewriteRule ^index\.html$ / [R=301,L]
+RewriteRule ^index$ / [R=301,L]
+
+# 3. توجيه خاص لرابط المطور admin2003
+RewriteRule ^admin2003$ admin [L,R=301]
+
+# 4. منع تصفح المجلدات
+Options -Indexes
+DirectoryIndex index.html
