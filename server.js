@@ -55,7 +55,7 @@ app.get('/watch.php', (req, res) => {
     const match = matches.find(m => m.id == id);
     
     if (match) {
-        let html = fs.readFileSync(path.join(__dirname, 'watch.php'), 'utf8');
+        let html = fs.readFileSync(path.join(__dirname, 'watch.template'), 'utf8');
         html = html.replace(/<\?php echo \$m\[\'homeTeam\'\] \?\? \'\'; \?>/g, match.homeTeam);
         html = html.replace(/<\?php echo \$m\[\'awayTeam\'\] \?\? \'\'; \?>/g, match.awayTeam);
         html = html.replace(/<\?php echo \$m\[\'homeLogo\'\] \?\? \'\'; \?>/g, match.homeLogo);
@@ -72,7 +72,7 @@ app.get('/watch.php', (req, res) => {
 
 // 3. عرض الصفحة الرئيسية
 app.get('/', (req, res) => {
-    let html = fs.readFileSync(path.join(__dirname, 'index.php'), 'utf8');
+    let html = fs.readFileSync(path.join(__dirname, 'index.template'), 'utf8');
     const matches = fs.readFileSync(path.join(__dirname, 'data/matches.json'), 'utf8');
     html = html.replace(/<\?php[\s\S]*?\$allMatches = [\s\S]*?\?>/g, `<script>const allMatches = ${matches};</script>`);
     html = html.replace(/<\?php[\s\S]*?\?>/g, '');
