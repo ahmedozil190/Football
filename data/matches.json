@@ -11,7 +11,7 @@
     "status_text": "مباشر الآن",
     "day": "today",
     "channel": "الجزيرة",
-    "stream_url": "https://live-hls-uap-aka.live.aljazeera.net/aljazeera/arabic/160/index.m3u8",
+    "stream_url": "http://ugeen.live:8080/Ugeen_VIP269W1Z/nBQtQh/4526",
     "homeScore": 0,
     "awayScore": 0
   },
@@ -27,7 +27,7 @@
     "status_text": "مباشر الآن",
     "day": "today",
     "channel": "سكاي نيوز",
-    "stream_url": "https://live.skynewsarabia.com/hls/sna.m3u8",
+    "stream_url": "http://ugeen.live:8080/Ugeen_VIP269W1Z/nBQtQh/4526",
     "homeScore": 0,
     "awayScore": 0
   }
