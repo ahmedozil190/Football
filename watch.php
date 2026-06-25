@@ -74,8 +74,8 @@
                     if (!video || !url) return;
                     err.style.display = 'none';
 
-                    // تحويل الرابط ليمر عبر البروكسي المطور (مثل كود Node.js الخاص بك)
-                    const finalUrl = `proxy.php?url=${encodeURIComponent(url)}`;
+                    // تحويل الرابط ليمر عبر البروكسي المطور (Node.js)
+                    const finalUrl = `/proxy?url=${encodeURIComponent(url)}`;
                     console.log("Loading via Final Proxy:", finalUrl);
                     
                     if (hls) { hls.destroy(); hls = null; }

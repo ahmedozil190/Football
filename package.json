@@ -1,0 +1,15 @@
+{
+  "name": "live-match-streaming",
+  "version": "1.0.0",
+  "description": "Premium Sports Streaming Site",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "http-proxy-agent": "^7.0.0",
+    "https-proxy-agent": "^7.0.0",
+    "node-fetch": "^2.6.9"
+  }
+}
