@@ -17,7 +17,10 @@ function proxyRequest(targetUrl, res, redirectCount = 0) {
             port: parsedTarget.port || (parsedTarget.protocol === 'https:' ? 443 : 80),
             path: parsedTarget.pathname + parsedTarget.search,
             method: 'GET',
-            headers: { 'User-Agent': 'VLC/3.0.18 LibVLC/3.0.18' }
+            headers: { 
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+                'Referer': parsedTarget.origin
+            }
         };
         const proxyReq = protocol.request(options, (proxyRes) => {
             if (proxyRes.statusCode >= 300 && proxyRes.statusCode < 400 && proxyRes.headers.location) {

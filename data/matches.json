@@ -1,34 +1,34 @@
 [
   {
     "id": 201,
-    "homeTeam": "الجزيرة مباشر",
-    "awayTeam": "بث حي",
-    "homeLogo": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Al_Jazeera_Channels_Logo.svg/1200px-Al_Jazeera_Channels_Logo.svg.png",
-    "awayLogo": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Al_Jazeera_Channels_Logo.svg/1200px-Al_Jazeera_Channels_Logo.svg.png",
-    "league": "أخبار عالمية",
+    "homeTeam": "قناة الاختبار 1",
+    "awayTeam": "بث مباشر",
+    "homeLogo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Soccer_ball.svg/1024px-Soccer_ball.svg.png",
+    "awayLogo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Soccer_ball.svg/1024px-Soccer_ball.svg.png",
+    "league": "اختبار النظام",
     "time": "24/7",
     "status": "live",
     "status_text": "مباشر الآن",
     "day": "today",
-    "channel": "الجزيرة",
-    "stream_url": "http://ugeen.live:8080/Ugeen_VIP269W1Z/nBQtQh/4526",
-    "homeScore": 0,
-    "awayScore": 0
+    "channel": "قناة 1",
+    "stream_url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    "homeScore": 1,
+    "awayScore": 1
   },
   {
     "id": 202,
-    "homeTeam": "سكاي نيوز",
-    "awayTeam": "عربية",
-    "homeLogo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Sky_News_Arabia_logo.svg/1200px-Sky_News_Arabia_logo.svg.png",
-    "awayLogo": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Sky_News_Arabia_logo.svg/1200px-Sky_News_Arabia_logo.svg.png",
-    "league": "أخبار",
+    "homeTeam": "قناة الاختبار 2",
+    "awayTeam": "بث فضائي",
+    "homeLogo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Soccer_ball.svg/1024px-Soccer_ball.svg.png",
+    "awayLogo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Soccer_ball.svg/1024px-Soccer_ball.svg.png",
+    "league": "اختبار النظام",
     "time": "24/7",
     "status": "live",
     "status_text": "مباشر الآن",
     "day": "today",
-    "channel": "سكاي نيوز",
-    "stream_url": "http://ugeen.live:8080/Ugeen_VIP269W1Z/nBQtQh/4526",
-    "homeScore": 0,
-    "awayScore": 0
+    "channel": "قناة 2",
+    "stream_url": "https://ntv1.akamaized.net/hls/live/2023533/NTV-1/master.m3u8",
+    "homeScore": 2,
+    "awayScore": 2
   }
 ]
