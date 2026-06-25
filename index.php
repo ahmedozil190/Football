@@ -93,8 +93,8 @@ header("Pragma: no-cache");
             </a>
             <nav class="nav-links">
                 <a href="/" class="active"><i class="fa-solid fa-house"></i> الرئيسية</a>
-                <a href="/all-news"><i class="fa-regular fa-newspaper"></i> آخر الأخبار</a>
-                <a href="/contact"><i class="fa-solid fa-envelope"></i> اتصل بنا</a>
+                <a href="all-news.php"><i class="fa-regular fa-newspaper"></i> آخر الأخبار</a>
+                <a href="contact.php"><i class="fa-solid fa-envelope"></i> اتصل بنا</a>
             </nav>
             <div class="nav-right">
                 <div class="desktop-only" style="display:flex; gap:10px;">
@@ -115,8 +115,8 @@ header("Pragma: no-cache");
         </div>
         <nav class="sidebar-links">
             <a href="/" class="active"><i class="fa-solid fa-house"></i> الرئيسية</a>
-            <a href="/all-news"><i class="fa-regular fa-newspaper"></i> آخر الأخبار</a>
-            <a href="/contact"><i class="fa-solid fa-envelope"></i> اتصل بنا</a>
+            <a href="all-news.php"><i class="fa-regular fa-newspaper"></i> آخر الأخبار</a>
+            <a href="contact.php"><i class="fa-solid fa-envelope"></i> اتصل بنا</a>
         </nav>
         <div class="sidebar-footer">
             <div class="sidebar-social">
@@ -159,7 +159,7 @@ header("Pragma: no-cache");
                     foreach ($allMatches as $m) {
                         if (($m['day'] ?? 'today') !== $day) continue;
                         $found = true; ?>
-                <a href="/watch?id=<?php echo $m['id']; ?>" class="match-card-wrapper"
+                <a href="watch.php?id=<?php echo $m['id']; ?>" class="match-card-wrapper"
                     style="text-decoration:none; color:inherit; display:block;">
                     <div class="match-card <?php echo $m['status']; ?>">
                         <div class="match-main-info">
@@ -226,11 +226,11 @@ header("Pragma: no-cache");
                             $found = true;
                             foreach ($latest as $n) { ?>
                 <article class="news-card">
-                    <a href="/news?id=<?php echo $n['id']; ?>">
+                    <a href="news.php?id=<?php echo $n['id']; ?>">
                         <div class="news-img-wrapper"><img src="<?php echo $n['image']; ?>"></div>
                     </a>
                     <div class="news-content">
-                        <a href="/news?id=<?php echo $n['id']; ?>">
+                        <a href="news.php?id=<?php echo $n['id']; ?>">
                             <h3>
                                 <?php echo $n['title']; ?>
                             </h3>
@@ -238,7 +238,7 @@ header("Pragma: no-cache");
                         <p>
                             <?php echo mb_substr(strip_tags($n['content']), 0, 120); ?>...
                         </p>
-                        <a href="/news?id=<?php echo $n['id']; ?>" class="read-more-btn">عرض المزيد <i
+                        <a href="news.php?id=<?php echo $n['id']; ?>" class="read-more-btn">عرض المزيد <i
                                 class="fa-solid fa-arrow-left"></i></a>
                     </div>
                 </article>
