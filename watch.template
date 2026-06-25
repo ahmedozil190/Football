@@ -7,60 +7,68 @@
     <title>كورة لايف - مشاهدة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- مكتبات التشغيل (HLS و TS) -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mpegts.js@latest/dist/mpegts.min.js"></script>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .watch-container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+        .video-box { background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; position: relative; }
+        #player { width: 100%; height: 100%; }
+        #error-box { display: none; position: absolute; inset: 0; background: rgba(220,38,38,0.9); color: #fff; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    </style>
 </head>
 <body>
     <header class="navbar">
         <div class="nav-container">
-            <a href="/" class="nav-logo"><span>كورة لايف</span></a>
+            <a href="/" class="nav-logo"><i class="fa-solid fa-play"></i><span> كورة لايف</span></a>
         </div>
     </header>
 
-    <div class="watch-container" style="max-width:1000px; margin:20px auto; padding:0 15px;">
-        <div class="main-video-wrapper" style="position:relative; background:#000; border-radius:12px; overflow:hidden; aspect-ratio:16/9;">
-            <div id="player-error" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10; flex-direction:column; align-items:center; justify-content:center; color:#fff;">
-                <p>فشل تشغيل البث - الرابط غير متاح حالياً</p>
+    <div class="watch-container">
+        <div class="video-box">
+            <div id="error-box">
+                <h3>فشل تشغيل البث</h3>
+                <p>الرابط غير متاح حالياً</p>
             </div>
-            <video id="player" controls autoplay style="width:100%; height:100%;"></video>
+            <video id="player" controls autoplay playsinline></video>
         </div>
-
-        <div style="margin-top:20px; text-align:center;">
-             <h3><?php echo $m['homeTeam'] ?? ''; ?> vs <?php echo $m['awayTeam'] ?? ''; ?></h3>
-        </div>
-
-        <script>
-            function loadUrl(streamUrl) {
-                const video = document.getElementById('player');
-                const finalUrl = `/proxy?url=${encodeURIComponent(streamUrl)}`;
-                
-                // 1. إذا كان الرابط HLS
-                if (streamUrl.includes('.m3u8')) {
-                    if (Hls.isSupported()) {
-                        const hls = new Hls();
-                        hls.loadSource(finalUrl);
-                        hls.attachMedia(video);
-                        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-                    }
-                } 
-                // 2. إذا كان الرابط TS (وهذا هو حال رابطك)
-                else {
-                    if (mpegts.getFeatureList().mseLivePlayback) {
-                        const player = mpegts.createPlayer({ type: 'mse', isLive: true, url: finalUrl });
-                        player.attachMediaElement(video);
-                        player.load();
-                        player.play().catch(() => {
-                            // محاولة أخيرة إذا كان رابط مباشر عادي
-                            video.src = finalUrl;
-                            video.play();
-                        });
-                    }
-                }
-            }
-            document.addEventListener('DOMContentLoaded', () => { loadUrl("<?php echo $m['stream_url'] ?? ''; ?>"); });
-        </script>
     </div>
+
+    <script>
+        const STREAM_URL = "{{STREAM_URL}}";
+
+        function loadStream(url) {
+            const video = document.getElementById('player');
+            const errBox = document.getElementById('error-box');
+            
+            if (!url || url === "{{STREAM_URL}}") {
+                errBox.style.display = 'flex';
+                return;
+            }
+
+            const proxyUrl = `/proxy?url=${encodeURIComponent(url)}`;
+            console.log("Stream URL:", url);
+            console.log("Proxy URL:", proxyUrl);
+
+            if (url.includes('.m3u8')) {
+                if (Hls.isSupported()) {
+                    const hls = new Hls({ debug: false });
+                    hls.loadSource(proxyUrl);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+                    hls.on(Hls.Events.ERROR, (e, data) => {
+                        if (data.fatal) errBox.style.display = 'flex';
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = proxyUrl;
+                    video.play();
+                }
+            } else {
+                video.src = proxyUrl;
+                video.play().catch(() => errBox.style.display = 'flex');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => loadStream(STREAM_URL));
+    </script>
 </body>
 </html>

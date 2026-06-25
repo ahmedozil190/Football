@@ -48,14 +48,8 @@ app.get('/watch.php', (req, res) => {
     const match = matches.find(m => m.id == id);
     if (match) {
         let html = fs.readFileSync(path.join(__dirname, 'watch.template'), 'utf8');
-        html = html.replace(/<\?php echo \$m\[\'homeTeam\'\] \?\? \'\'; \?>/g, match.homeTeam);
-        html = html.replace(/<\?php echo \$m\[\'awayTeam\'\] \?\? \'\'; \?>/g, match.awayTeam);
-        html = html.replace(/<\?php echo \$m\[\'homeLogo\'\] \?\? \'\'; \?>/g, match.homeLogo);
-        html = html.replace(/<\?php echo \$m\[\'awayLogo\'\] \?\? \'\'; \?>/g, match.awayLogo);
-        html = html.replace(/<\?php echo \$m\[\'homeScore\'\] \?\? \'\'; \?>/g, match.homeScore);
-        html = html.replace(/<\?php echo \$m\[\'awayScore\'\] \?\? \'\'; \?>/g, match.awayScore);
-        html = html.replace(/<\?php echo \$m\[\'stream_url\'\] \?\? \'\'; \?>/g, match.stream_url);
-        html = html.replace(/<\?php[\s\S]*?\?>/g, '');
+        // استبدال بسيط وموثوق باستخدام العلامات المميزة
+        html = html.replace('{{STREAM_URL}}', match.stream_url || '');
         res.send(html);
     } else res.status(404).send('Match not found');
 });
