@@ -51,8 +51,17 @@
                 return;
             }
 
-            // HTTPS مباشر، HTTP عبر البروكسي
-            const finalUrl = url.startsWith('http://') 
+            // أي رابط يحتوي على port غير قياسي أو http يمر عبر البروكسي
+            function needsProxy(u) {
+                try {
+                    const parsed = new URL(u);
+                    const port = parsed.port;
+                    const isNonStandardPort = port && port !== '80' && port !== '443';
+                    return parsed.protocol === 'http:' || isNonStandardPort;
+                } catch(e) { return false; }
+            }
+
+            const finalUrl = needsProxy(url)
                 ? `/proxy?url=${encodeURIComponent(url)}` 
                 : url;
 
