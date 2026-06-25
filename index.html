@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مستخرج مشغلات M3U وبث القنوات</title>
+    <!-- Google Fonts (Cairo) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Hls.js and Mpegts.js for playing streams -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mpegts.js@latest/dist/mpegts.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Control Panel -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-satellite-dish"></i>
+                <h2>بثـي | M3U Extractor</h2>
+            </div>
+            
+            <div class="import-section">
+                <h3><i class="fa-solid fa-file-import"></i> استيراد ملف M3U</h3>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="upload"><i class="fa-solid fa-upload"></i> رفع ملف</button>
+                    <button class="tab-btn" data-tab="paste"><i class="fa-solid fa-clipboard"></i> لصق نص</button>
+                    <button class="tab-btn" data-tab="url"><i class="fa-solid fa-link"></i> رابط خارجي</button>
+                </div>
+                
+                <div class="tab-content active" id="tab-upload">
+                    <label class="drop-zone" id="drop-zone">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>اسحب ملف .m3u هنا أو اضغط للاختيار</span>
+                        <input type="file" id="file-input" accept=".m3u,.m3u8" style="display: none;">
+                    </label>
+                </div>
+                
+                <div class="tab-content" id="tab-paste">
+                    <textarea id="paste-input" placeholder="ألصق محتويات ملف الـ M3U هنا..."></textarea>
+                    <button class="btn btn-primary" id="btn-parse-text"><i class="fa-solid fa-bolt"></i> معالجة النص</button>
+                </div>
+
+                <div class="tab-content" id="tab-url">
+                    <input type="text" id="url-input" placeholder="أدخل رابط ملف M3U (مثل: http://...)">
+                    <button class="btn btn-primary" id="btn-parse-url"><i class="fa-solid fa-cloud-download"></i> تحميل ومعالجة</button>
+                </div>
+            </div>
+
+            <!-- Global statistics -->
+            <div class="stats-card">
+                <h4><i class="fa-solid fa-chart-simple"></i> إحصائيات الملف</h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-val" id="stat-total">0</span>
+                        <span class="stat-label">إجمالي القنوات</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val" id="stat-sports">0</span>
+                        <span class="stat-label">قنوات رياضية</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick instructions -->
+            <div class="instructions-card">
+                <h4><i class="fa-solid fa-circle-info"></i> كيف يعمل هذا؟</h4>
+                <ol>
+                    <li>قم برفع أو لصق ملف M3U الخاص بك.</li>
+                    <li>ابحث عن القناة المطلوبة (مثل beIN Sports).</li>
+                    <li>انسخ رابط القناة المباشر لاستخدامه في موقعك.</li>
+                    <li>اختبر تشغيل القناة مباشرة للتأكد من عملها.</li>
+                </ol>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Player Section -->
+            <section class="player-section card">
+                <div class="card-header">
+                    <h3><i class="fa-solid fa-play"></i> مشغل البث التجريبي</h3>
+                    <div class="header-actions">
+                        <label class="proxy-checkbox-label">
+                            <input type="checkbox" id="use-proxy" checked>
+                            <span>تفعيل الخادم الوسيط (CORS Proxy)</span>
+                        </label>
+                        <span class="badge badge-live" id="stream-status">غير متصل</span>
+                    </div>
+                </div>
+                <div class="player-wrapper">
+                    <video id="video-player" controls poster="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1200&auto=format&fit=crop"></video>
+                    <div class="player-placeholder" id="player-placeholder">
+                        <i class="fa-solid fa-tv"></i>
+                        <p>اختر قناة من القائمة بالأسفل لبدء البث التجريبي</p>
+                    </div>
+                </div>
+                <div class="player-info" id="player-info" style="display: none;">
+                    <div class="channel-meta">
+                        <img id="playing-logo" src="" alt="" onerror="this.src='https://placehold.co/100x100/1e1e2e/ffffff?text=TV'">
+                        <div>
+                            <h4 id="playing-name">اسم القناة</h4>
+                            <p id="playing-group">التصنيف</p>
+                        </div>
+                    </div>
+                    <div class="url-action-bar">
+                        <input type="text" id="playing-url" readonly>
+                        <button class="btn btn-secondary" id="btn-copy-playing"><i class="fa-solid fa-copy"></i> نسخ الرابط</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Channels Search and List -->
+            <section class="channels-section card">
+                <div class="filters-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input" placeholder="ابحث باسم القناة أو الدوري...">
+                    </div>
+                    <div class="select-box">
+                        <select id="group-filter">
+                            <option value="">جميع الأقسام</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="channels-list-header">
+                    <span>شعار</span>
+                    <span>اسم القناة</span>
+                    <span>القسم / التصنيف</span>
+                    <span>العمليات</span>
+                </div>
+
+                <div class="channels-container" id="channels-container">
+                    <div class="empty-state">
+                        <i class="fa-solid fa-list-check"></i>
+                        <h3>لا توجد قنوات بعد</h3>
+                        <p>قم باستيراد ملف M3U لعرض القنوات واستخراج الروابط.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">تم نسخ الرابط بنجاح!</div>
+
+    <script src="app.js"></script>
+</body>
+</html>
