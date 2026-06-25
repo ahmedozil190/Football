@@ -12,8 +12,8 @@
     <style>
         .watch-container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
         .video-box { background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 16/9; position: relative; }
-        #player { width: 100%; height: 100%; }
-        #error-box { display: none; position: absolute; inset: 0; background: rgba(220,38,38,0.9); color: #fff; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        #player { width: 100%; height: 100%; display: block; }
+        #error-box { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.85); color: #fff; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; gap: 10px; }
     </style>
 </head>
 <body>
@@ -26,9 +26,9 @@
     <div class="watch-container">
         <div class="video-box">
             <div id="error-box">
-                <i class="fa-solid fa-circle-exclamation" style="font-size:40px; margin-bottom:10px;"></i>
-                <h3 id="error-title">فشل تشغيل البث</h3>
-                <p id="error-msg" style="font-size:13px; opacity:0.8; max-width:400px; word-break:break-all;"></p>
+                <i class="fa-solid fa-circle-exclamation" style="font-size:40px;"></i>
+                <h3 id="err-title">فشل تشغيل البث</h3>
+                <p id="err-msg" style="font-size:13px; opacity:0.8; max-width:400px; word-break:break-all; direction:ltr; text-align:left;"></p>
             </div>
             <video id="player" controls autoplay playsinline></video>
         </div>
@@ -38,52 +38,60 @@
         const STREAM_URL = "{{STREAM_URL}}";
 
         function showError(msg) {
-            const errBox = document.getElementById('error-box');
-            document.getElementById('error-msg').textContent = msg || '';
-            errBox.style.display = 'flex';
+            document.getElementById('err-msg').textContent = msg;
+            document.getElementById('error-box').style.display = 'flex';
         }
 
         function loadStream(url) {
+            console.log("loadStream called with:", url);
             const video = document.getElementById('player');
-            
-            if (!url || url === '{{STREAM_URL}}') {
-                showError('لم يتم تحديد رابط البث');
+
+            if (!url || url.trim() === '' || url === '{{STREAM_URL}}') {
+                showError('No stream URL provided');
                 return;
             }
 
-            // HTTPS يشتغل مباشرة، HTTP يمر عبر البروكسي
+            // HTTPS مباشر، HTTP عبر البروكسي
             const finalUrl = url.startsWith('http://') 
                 ? `/proxy?url=${encodeURIComponent(url)}` 
                 : url;
-            
-            console.log("Playing:", finalUrl);
+
+            console.log("Final URL:", finalUrl);
 
             if (url.includes('.m3u8')) {
                 if (Hls.isSupported()) {
                     const hls = new Hls();
                     hls.loadSource(finalUrl);
                     hls.attachMedia(video);
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        console.log("HLS manifest parsed, playing...");
+                        video.play();
+                    });
                     hls.on(Hls.Events.ERROR, (e, data) => {
-                        if (data.fatal) showError(`HLS Error: ${data.type} - ${data.details}`);
+                        console.error("HLS Error:", data);
+                        if (data.fatal) showError(`HLS ${data.type}: ${data.details}`);
                     });
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                     video.src = finalUrl;
                     video.play();
+                } else {
+                    showError('HLS not supported in this browser');
                 }
             } else {
-                // للروابط المباشرة (TS/HTTP): نجرب أولاً ونعرض الخطأ الحقيقي
-                fetch(finalUrl, { method: 'GET' })
-                    .then(r => {
-                        if (!r.ok) return r.text().then(t => showError(`Server: ${r.status} - ${t}`));
-                        video.src = finalUrl;
-                        video.play().catch(e => showError(`Player Error: ${e.message}`));
-                    })
-                    .catch(e => showError(`Network Error: ${e.message}`));
+                // بث مباشر TS
+                video.src = finalUrl;
+                video.onerror = (e) => {
+                    const codes = { 1:'ABORTED', 2:'NETWORK', 3:'DECODE', 4:'SRC_NOT_SUPPORTED' };
+                    showError(`Video Error ${video.error?.code}: ${codes[video.error?.code] || 'Unknown'} - ${video.error?.message || ''}`);
+                };
+                video.play().catch(e => showError(`Play Error: ${e.message}`));
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => loadStream(STREAM_URL));
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("Page loaded. STREAM_URL =", STREAM_URL);
+            loadStream(STREAM_URL);
+        });
     </script>
 </body>
 </html>
